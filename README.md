@@ -10,6 +10,10 @@ file with a different value is an alteration. This tool finds them all.
 *The page opened with `?region=scorn&sort=nchg&dir=desc` (see
 [URL parameters](#url-parameters)).*
 
+**Live page:** <https://tannerrj.github.io/crossfire-monster-stat-audit/>
+(example view, monsters with altered `exp`:
+[`?stat=exp`](https://tannerrj.github.io/crossfire-monster-stat-audit/?stat=exp))
+
 Each row of the page shows:
 
 | Column | Meaning |
