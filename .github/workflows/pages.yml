@@ -1,0 +1,61 @@
+name: Regenerate and publish page
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"   # weekly, Mondays 06:17 UTC
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - monster_stat_audit.py
+      - .github/workflows/pages.yml
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  MAPS_REPO: https://git.code.sf.net/p/crossfire/crossfire-maps
+  ARCH_REPO: https://git.code.sf.net/p/crossfire/crossfire-arch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Clone Crossfire maps and archetypes
+        run: |
+          git clone --depth 1 "$MAPS_REPO" "$RUNNER_TEMP/maps"
+          git clone --depth 1 "$ARCH_REPO" "$RUNNER_TEMP/arch"
+
+      - name: Generate page
+        run: |
+          mkdir site
+          python3 monster_stat_audit.py -m "$RUNNER_TEMP/maps" -a "$RUNNER_TEMP/arch" -o site/index.html
+          test -s site/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

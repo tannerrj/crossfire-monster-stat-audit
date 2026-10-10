@@ -1,0 +1,8 @@
+# Generated output; rebuild with monster_stat_audit.py
+index.html
+*.json
+
+# Python / OS
+__pycache__/
+*.pyc
+.DS_Store
